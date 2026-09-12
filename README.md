@@ -3,48 +3,57 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Soroban](https://img.shields.io/badge/Soroban-v22+-purple.svg)](https://soroban.stellar.org)
-[![Build Status](https://img.shields.io/badge/CI-Passing-brightgreen.svg)]()
+[![Build Status](https://img.shields.io/badge/CI-Passing-brightgreen.svg)](https://github.com/Ranjeet2063/sorobanflow)
+[![Rust](https://img.shields.io/badge/Rust-1.80+-orange.svg)](https://www.rust-lang.org)
 
 ---
 
 ## 📌 Overview
-**SorobanFlow** is a decentralized, non-custodial streaming and payroll infrastructure natively engineered for the **Stellar / Soroban** network. It allows decentralized organizations, startups, and cross-border teams to execute continuous token streaming, milestone payouts, and cliff vesting in **USDC/EURC** with sub-cent transaction costs and zero gas surprises.
+**SorobanFlow** is a decentralized, non-custodial streaming and payroll infrastructure natively engineered for the **Stellar / Soroban** network. It empowers decentralized organizations, startups, and cross-border teams to execute continuous token streaming, milestone payouts, and cliff vesting in **USDC/EURC** with sub-cent transaction costs (< $0.0001) and deterministic 4–5 second finality.
 
 ---
 
 ## 🌟 Key Features
-* **Continuous Real-Time Streaming**: Stream salaries block-by-block with linear interpolation.
+* **Continuous Real-Time Streaming**: Stream salaries block-by-block using linear time-decay interpolation.
 * **Epoch-Based Automated Payroll**: Schedule recurring batch distributions without manual approval bottlenecks.
-* **Freighter Preflight Session Guards**: Built-in client validation catching RPC/account mismatches before submitting Soroban transactions.
+* **Cliff & Vesting Milestone Locks**: Lock team/advisor tokens with enforceable cliff periods and linear unlock curves.
+* **Freighter Preflight Session Guards**: Built-in client validation catching network/account mismatches before submitting Soroban transactions.
+* **Autonomous Storage TTL Renewal**: Automatic persistent storage lifetime extension on contract invocation, preventing ledger expiration.
 * **Non-Custodial Multi-Token Support**: Native support for Stellar USDC, EURC, and custom Soroban SAC tokens.
 * **Developer SDK**: Lightweight TypeScript SDK (`@sorobanflow/sdk`) with Next.js/React hooks.
 
 ---
 
 ## 🏗️ Architecture
-```
-┌─────────────────────────────────────────────────────────────┐
-│             Next.js 15 / React Admin & Contributor UI       │
-│      (Freighter Wallet Provider + Session Preflight Guard)   │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ TypeScript SDK RPC calls
-┌──────────────────────────────▼──────────────────────────────┐
-│                  @sorobanflow/sdk Client                     │
-│    - Transaction Simulation & Preflight Network Verification│
-│    - XDR Encoding / Decoding & Native Value Mapping         │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ Soroban RPC Server
-┌──────────────────────────────▼──────────────────────────────┐
-│               Soroban Smart Contracts (Rust)                 │
-│  - Payroll Engine (Recurring Cron / Epoch Distributions)    │
-│  - Vesting Engine (Continuous Block-Timestamp Interpolation)│
-│  - Storage Management (Persistent & Instance TTL Automation)│
-└─────────────────────────────────────────────────────────────┘
+
+```mermaid
+flowchart TD
+    subgraph UI ["Frontend Application Layer (Next.js 15)"]
+        A1["Employer / DAO Dashboard<br/>(Bulk CSV, Stream Creator, Analytics)"]
+        A2["Contributor Portal<br/>(Live Streaming Balance, 1-Click Claim)"]
+        A3["Freighter Wallet Session Provider<br/>(Preflight Validation & Network Assertion)"]
+    end
+
+    subgraph SDK ["Developer SDK Layer (@sorobanflow/sdk)"]
+        B1["Simulation Engine<br/>(Pre-evaluates Soroban Auth & Footprint)"]
+        B2["XDR & ScVal Serializer<br/>(Type-safe Arguments & Event Parsing)"]
+        B3["Session Integrity Guard<br/>(Rejects network/account divergence)"]
+    end
+
+    subgraph ONCHAIN ["Soroban Host Environment (Rust Smart Contracts)"]
+        C1["Vesting & Streaming Engine<br/>• Linear Interpolation<br/>• Cliff Milestone Locks<br/>• Revocable Stream Escrow"]
+        C2["Automated Payroll Engine<br/>• Epoch Distributions<br/>• Per-Second Rate Debit<br/>• Non-Custodial Multi-Token Vault"]
+        C3["Treasury & Storage Guard<br/>• Emergency Pause Circuit Breaker<br/>• Dynamic Persistent Storage TTL Renewal<br/>• Graceful Zero-Rent Archival"]
+    end
+
+    UI -->|Typed RPC Invocations| SDK
+    SDK -->|Soroban RPC API| ONCHAIN
 ```
 
 ---
 
 ## 🧪 Testing & Verification
+
 ```bash
 # Build contracts
 cargo build --target wasm32-unknown-unknown --release
