@@ -1,9 +1,10 @@
 # 🌊 SorobanFlow
 > **Turnkey Automated Payroll, Continuous Streaming & Session-Guarded Vesting Protocol for Stellar / Soroban**
 
+[![CI](https://github.com/Ranjeet2063/sorobanflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Ranjeet2063/sorobanflow/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Ranjeet2063/sorobanflow?color=blue)](https://github.com/Ranjeet2063/sorobanflow/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Soroban](https://img.shields.io/badge/Soroban-v22+-purple.svg)](https://soroban.stellar.org)
-[![Build Status](https://img.shields.io/badge/CI-Passing-brightgreen.svg)](https://github.com/Ranjeet2063/sorobanflow)
 [![Rust](https://img.shields.io/badge/Rust-1.80+-orange.svg)](https://www.rust-lang.org)
 
 ---

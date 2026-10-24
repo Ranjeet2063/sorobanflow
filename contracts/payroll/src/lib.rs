@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, String};
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -59,7 +59,43 @@ impl SorobanFlowPayroll {
         count
     }
 
+    pub fn claim_stream(env: Env, recipient: Address, stream_id: u64) -> i128 {
+        recipient.require_auth();
+        let mut schedule: StreamSchedule = env
+            .storage()
+            .instance()
+            .get(&DataKey::Schedule(stream_id))
+            .expect("Stream not found");
+
+        assert_eq!(schedule.recipient, recipient, "Unauthorized recipient");
+
+        let now = env.ledger().timestamp();
+        let claimable = if now >= schedule.stop_time {
+            schedule.total_amount - schedule.claimed_amount
+        } else if now <= schedule.start_time {
+            0
+        } else {
+            let elapsed = (now - schedule.start_time) as i128;
+            let total_duration = (schedule.stop_time - schedule.start_time) as i128;
+            let vested = (schedule.total_amount * elapsed) / total_duration;
+            vested - schedule.claimed_amount
+        };
+
+        assert!(claimable > 0, "No funds available to claim");
+
+        schedule.claimed_amount += claimable;
+        env.storage().instance().set(&DataKey::Schedule(stream_id), &schedule);
+
+        let client = token::Client::new(&env, &schedule.token);
+        client.transfer(&env.current_contract_address(), &recipient, &claimable);
+
+        claimable
+    }
+
     pub fn get_schedule(env: Env, stream_id: u64) -> Option<StreamSchedule> {
         env.storage().instance().get(&DataKey::Schedule(stream_id))
     }
 }
+
+#[cfg(test)]
+mod test;
